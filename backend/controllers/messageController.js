@@ -20,22 +20,25 @@ exports.getMessages = async (req, res, next) => {
 }
 
 exports.postMessage = async (req, res, next) => {
-    try{
-        const { text, room } = req.body
-        if(!text) return res.status(400).json({success: false, message: "Message text is required"})
+  try {
+    const { text, room } = req.body;
 
-        const message = await Message.create({
-            text,
-            sender: req.user._id,
-            senderName: req.user.name,
-            room: room || 'global'
-        })
+    const message = await Message.create({
+      text,
+      sender: req.user._id,
+      senderName: req.user.name,
+      room: room || "global",
+    });
 
-        res.status(201).json({
-            success: true,
-            data: message
-        })
-    }catch(err){
-        next(err)
-    }
-}
+    const plainMessage = message.toObject();
+
+    io.emit("receiveMessage", plainMessage);
+
+    res.status(201).json({
+      success: true,
+      data: plainMessage,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

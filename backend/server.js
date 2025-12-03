@@ -32,6 +32,10 @@ const io = new Server(server, {
 io.on('connection', (socket)=>{
     console.log('Socket connected :: ', socket.id)
 
+    socket.on("sendMessage", (msg) => {
+        io.emit("receiveMessage", msg)
+    })
+
     socket.on('disconnect', ()=>{
         console.log('Socket disconnected :: ', socket.id)
     })
