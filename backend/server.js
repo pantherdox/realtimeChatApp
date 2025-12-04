@@ -36,6 +36,14 @@ io.on('connection', (socket)=>{
         io.emit("receiveMessage", msg)
     })
 
+    socket.on("typing", (user) => {
+        socket.broadcast.emit("showTyping", user)
+    })
+
+    socket.on("stopTyping", () => {
+        socket.broadcast.emit("hideTyping")
+    })
+
     socket.on('disconnect', ()=>{
         console.log('Socket disconnected :: ', socket.id)
     })

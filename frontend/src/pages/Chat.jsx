@@ -8,6 +8,7 @@ const socket = io("http://localhost:3000");
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const [typingUser, setTypingUser] = useState("");
   const bottomRef = useRef();
   const navigate = useNavigate();
 
@@ -33,6 +34,15 @@ function Chat() {
       scrollToBottom();
     });
 
+    //listen to typing event
+    socket.on("showTyping", (user) => {
+      setTypingUser(`${user} is typing...`)
+    })
+
+    socket.on("hideTyping", () => {
+      setTypingUser("")
+    })
+
     return () => {
       socket.off("receiveMessage");
     };
@@ -54,6 +64,16 @@ function Chat() {
     setText("");
   };
 
+  const handleTyping = (e) => {
+    setText(e.target.value)
+
+    if(e.target.value.trim()){
+      socket.emit("typing", name)
+    } else {
+      socket.emit("stopTyping")
+    }
+  }
+
   return (
     <div>
       <h3>Welcome, {name}</h3>
@@ -66,7 +86,7 @@ function Chat() {
         <div ref={bottomRef}></div>
       </div>
 
-      <input value={text} onChange={(e)=>setText(e.target.value)} placeholder="Type message"/>
+      <input value={text} onChange={handleTyping} placeholder="Type message"/>
       <button onClick={sendMessage}>Send</button>
     </div>
   );
