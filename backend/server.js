@@ -34,8 +34,8 @@ const io = new Server(server, {
 io.on('connection', (socket)=>{
     console.log('Socket connected :: ', socket.id)
 
-    socket.on("sendMessage", (msg) => {
-        io.emit("receiveMessage", msg)
+    socket.on("sendMessage", (data) => {
+        io.to(data.room || "global").emit("receiveMessage", data)
     })
 
     socket.on("typing", (user) => {
@@ -49,6 +49,10 @@ io.on('connection', (socket)=>{
     socket.on("joinUser", (user) => {
         onlineUsers.set(socket.id, user);
         io.emit("onlineUsers", Array.from(onlineUsers.values()))
+    })
+
+    socket.on("joinRoom", (room) => {
+        socket.join(room);
     })
 
     socket.on('disconnect', ()=>{
