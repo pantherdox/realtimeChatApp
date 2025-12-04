@@ -14,6 +14,8 @@ app.use(express.json())
 
 connectDB()
 
+let onlineUsers = new Map();
+
 app.use('/api/v1/auth', userRoutes)
 app.use('/api/v1/messages', messageRoutes)
 
@@ -44,7 +46,14 @@ io.on('connection', (socket)=>{
         socket.broadcast.emit("hideTyping")
     })
 
+    socket.on("joinUser", (user) => {
+        onlineUsers.set(socket.id, user);
+        io.emit("onlineUsers", Array.from(onlineUsers.values()))
+    })
+
     socket.on('disconnect', ()=>{
+        onlineUsers.delete(socket.id)
+        io.emit("onlineUsers", Array.from(onlineUsers.values()))
         console.log('Socket disconnected :: ', socket.id)
     })
 })

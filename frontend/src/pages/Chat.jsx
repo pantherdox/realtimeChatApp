@@ -9,6 +9,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [typingUser, setTypingUser] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState([])
   const bottomRef = useRef();
   const navigate = useNavigate();
 
@@ -43,8 +44,17 @@ function Chat() {
       setTypingUser("")
     })
 
+    //online Users count
+    socket.emit("joinUser", name)
+
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users)
+    })
+
     return () => {
       socket.off("receiveMessage");
+      socket.off("showTyping");
+      socket.off("hideTyping");
     };
   }, []);
 
@@ -77,6 +87,10 @@ function Chat() {
   return (
     <div>
       <h3>Welcome, {name}</h3>
+      <div style={{ border: "1px solid black", width:"150px", height:"300px"}}>
+        <h4>Users Online</h4>
+        {onlineUsers.map((u, i) => <p key={i}>{u}</p>)}
+      </div>
       <div style={{ height: "300px", overflowY: "scroll", border:"1px solid gray" }}>
         {messages.map((m, i) => (
           <div key={i}>
@@ -84,6 +98,7 @@ function Chat() {
           </div>
         ))}
         <div ref={bottomRef}></div>
+        <p style={{ color: "gray", fontStyle: "italic" }}>{typingUser}</p>
       </div>
 
       <input value={text} onChange={handleTyping} placeholder="Type message"/>
