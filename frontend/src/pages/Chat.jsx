@@ -4,7 +4,7 @@ import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import "../css/Chat.css";
 
-const socket = io("http://localhost:3000");
+const socket = io("https://realtime-chat-app-backend-omega.vercel.app/");
 
 function Chat() {
   const [messages, setMessages] = useState([]);
